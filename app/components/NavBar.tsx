@@ -13,21 +13,13 @@ export function NavBar({ user }: NavBarProps) {
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-2">
-              <svg
-                className="w-8 h-8 text-blue-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M13 10V3L4 14h7v7l9-11h-7z"
-                />
-              </svg>
+              <img 
+                src="/logo.svg" 
+                alt="FitTrack Pro Logo" 
+                className="w-8 h-8" 
+              />
               <span className="text-xl font-bold text-gray-800 dark:text-white">
-                Fitness App
+                FitTrack Pro
               </span>
             </Link>
           </div>

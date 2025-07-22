@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Circle -->
+  <circle cx="100" cy="100" r="90" fill="#4F46E5" />
+  
+  <!-- Inner Circle -->
+  <circle cx="100" cy="100" r="75" fill="#818CF8" />
+  
+  <!-- FT Letters -->
+  <text x="100" y="115" font-family="Arial, sans-serif" font-size="70" font-weight="bold" text-anchor="middle" fill="#FFFFFF">FT</text>
+  
+  <!-- Pulse Line -->
+  <path d="M30,130 Q50,90 70,120 T100,110 T130,130 T170,100" stroke="#FFFFFF" stroke-width="6" fill="none" />
+  
+  <!-- Pro Text -->
+  <text x="100" y="160" font-family="Arial, sans-serif" font-size="24" font-weight="bold" text-anchor="middle" fill="#FFFFFF">PRO</text>
+</svg>
