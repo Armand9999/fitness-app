@@ -5,7 +5,12 @@ import { getMeal, regenerateMealPlan } from './action'
 import Link from 'next/link'
 
 export default function MealPlanPage() {
-  const [plan, setPlan] = useState<any>(null)
+  const [plan, setPlan] = useState<{
+    meals: string | Record<string, any>;
+    calories_target: number;
+    goal?: string;
+    [key: string]: any;
+  } | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [regenerating, setRegenerating] = useState(false)
@@ -31,8 +36,9 @@ export default function MealPlanPage() {
     try {
       const newPlan = await regenerateMealPlan()
       setPlan(newPlan)
-    } catch (err) {
+    } catch (error) {
       setError('Failed to regenerate meal plan')
+      console.error(error)
     } finally {
       setRegenerating(false)
     }
@@ -79,7 +85,7 @@ export default function MealPlanPage() {
             disabled={regenerating}
             className="px-3 py-1 text-sm bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 transition-colors"
           >
-            {regenerating ? '🔄 Generating...' : '🔄 New Plan'}
+            {regenerating ? "🔄 Generating..." : "🔄 New Plan"}
           </button>
           <Link 
             href="/protected" 

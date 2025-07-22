@@ -6,7 +6,7 @@ import Link from "next/link"
 
 export default function ProfileSetup() {
     const [isLoading, setIsLoading] = useState(false)
-    const [error, setError] = useState<string | null>(null)
+    const [errorMessage, setError] = useState<string | null>(null)
     const [success, setSuccess] = useState(false)
 
     const handleSubmit = async (formData: FormData) => {
@@ -39,9 +39,9 @@ export default function ProfileSetup() {
                 </Link>
             </div>
             
-            {error && (
+            {errorMessage && (
                 <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
-                    {error}
+                    {errorMessage}
                 </div>
             )}
             

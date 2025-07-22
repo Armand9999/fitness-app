@@ -1,4 +1,4 @@
-import zod, { number, z } from 'zod';
+import zod, { z } from 'zod';
 
 export const SignUpSchema = zod.object({
     name: z

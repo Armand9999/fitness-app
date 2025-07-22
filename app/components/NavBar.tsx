@@ -2,7 +2,11 @@ import Link from "next/link";
 import { SignOut } from "./SignOut";
 
 interface NavBarProps {
-  user: any | null;
+  user: {
+    id: string;
+    email?: string;
+    [key: string]: any;
+  } | null;
 }
 
 export function NavBar({ user }: NavBarProps) {

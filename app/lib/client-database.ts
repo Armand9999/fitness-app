@@ -73,7 +73,14 @@ export async function getWaterIntake(date?: string) {
 export async function saveWorkoutSession(workout: {
   name: string
   duration: number
-  exercises: any[]
+  exercises: Array<{
+    name: string;
+    sets?: number;
+    reps?: string;
+    duration?: string;
+    instructions: string;
+    rest?: string;
+  }>
 }) {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()

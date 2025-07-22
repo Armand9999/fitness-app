@@ -35,12 +35,7 @@ export async function regenerateMealPlan() {
 export async function getMeal() {
 
     
-    const dummyMeals = {
-        breakfast: ['Oats with banana and peanut butter' ],
-        lunch: ['Grilled chicken with rice and veggies'],
-        dinner: ['Salmon with quinoa and asparagus'],
-        snacks: ['Greek yogurt', 'Almonds']
-    }
+    // Removed unused dummy meals
 
     const supabase = await createClient();
 
@@ -52,7 +47,7 @@ export async function getMeal() {
     const today = new Date().toISOString().split('T')[0]
     
     try {
-        let { data: meal_plans, error } = await supabase
+        const { data: meal_plans, error } = await supabase
             .from('meal_plans')
             .select('*')
             .eq('user_id', user.id)
