@@ -1,12 +1,9 @@
 import Link from "next/link";
 import { SignOut } from "./SignOut";
+import { User } from "@supabase/supabase-js";
 
 interface NavBarProps {
-  user: {
-    id: string;
-    email?: string;
-    [key: string]: unknown;
-  } | null;
+  user: User | null;
 }
 
 export function NavBar({ user }: NavBarProps) {
