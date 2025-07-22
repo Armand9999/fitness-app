@@ -16,8 +16,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Fitness App",
+  title: "FitTrack Pro",
   description: "Your personal fitness companion",
+  icons: {
+    icon: "/logo.svg",
+    apple: "/logo.png",
+    shortcut: "/logo.svg",
+  },
 };
 
 async function getUser() {
