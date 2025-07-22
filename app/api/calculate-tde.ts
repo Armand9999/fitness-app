@@ -17,7 +17,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(400).json({ error: "Invalid parameter types" });
     }
 
-    const tde = calculateTDE(age, weight, height, String(gender), activity_level);
+    const tde = calculateTDE(age, weight, height, String(gender), String(activity_level));
 
 
     const supabase = createClient();
