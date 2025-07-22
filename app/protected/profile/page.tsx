@@ -20,7 +20,7 @@ export default function ProfileSetup() {
             } else {
                 setSuccess(true)
             }
-        } catch (err) {
+        } catch {
             setError("Error creating profile. Please try again.")
         } finally {
             setIsLoading(false)

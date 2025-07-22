@@ -78,7 +78,7 @@ export default function MealPlanPage() {
   return (
     <div className="max-w-2xl mx-auto p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Today's Meal Plan</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Today&apos;s Meal Plan</h1>
         <div className="flex items-center gap-3">
           <button
             onClick={handleRegenerate}
@@ -113,7 +113,7 @@ export default function MealPlanPage() {
               {mealType}
             </h3>
             <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-              {mealContent}
+              {typeof mealContent === 'string' ? mealContent : JSON.stringify(mealContent)}
             </p>
           </div>
         ))}

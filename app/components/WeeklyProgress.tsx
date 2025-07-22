@@ -167,7 +167,7 @@ export default function WeeklyProgress() {
 
       <div className="mt-4 text-center">
         <div className="text-sm text-gray-600 dark:text-gray-300">
-          Keep it up! "💪"
+          Keep it up! &quot;💪&quot;
         </div>
       </div>
     </div>

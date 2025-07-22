@@ -85,7 +85,7 @@ export default function ProtectedPage() {
                       </svg>
                     </div>
                     <div className="ml-5">
-                      <h3 className="text-lg font-medium text-gray-900 dark:text-white">Today's Goal</h3>
+                      <h3 className="text-lg font-medium text-gray-900 dark:text-white">Today&apos;s Goal</h3>
                       <p className="text-sm text-gray-500 dark:text-gray-400">30 minutes cardio</p>
                     </div>
                   </div>
