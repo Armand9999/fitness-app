@@ -6,10 +6,10 @@ import Link from 'next/link'
 
 export default function MealPlanPage() {
   const [plan, setPlan] = useState<{
-    meals: string | Record<string, any>;
+    meals: string | Record<string, unknown>;
     calories_target: number;
     goal?: string;
-    [key: string]: any;
+    [key: string]: unknown;
   } | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -69,10 +69,10 @@ export default function MealPlanPage() {
   const meals = mealsData?.Meals || mealsData
 
   const mealIcons = {
-    Breakfast: '🍳',
-    Lunch: '🥗', 
-    Dinner: '🍽️',
-    Snacks: '🍎'
+    Breakfast: "🍳",
+    Lunch: "🥗", 
+    Dinner: "🍽️",
+    Snacks: "🍎"
   }
 
   return (
@@ -109,7 +109,7 @@ export default function MealPlanPage() {
         {Object.entries(meals || {}).map(([mealType, mealContent]) => (
           <div key={mealType} className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:shadow-md transition-shadow">
             <h3 className="flex items-center text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2">
-              <span className="mr-2 text-xl">{mealIcons[mealType as keyof typeof mealIcons] || '🍴'}</span>
+              <span className="mr-2 text-xl">{mealIcons[mealType as keyof typeof mealIcons] || "🍴"}</span>
               {mealType}
             </h3>
             <p className="text-gray-600 dark:text-gray-300 leading-relaxed">

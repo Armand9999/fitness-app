@@ -5,7 +5,7 @@ interface NavBarProps {
   user: {
     id: string;
     email?: string;
-    [key: string]: any;
+    [key: string]: unknown;
   } | null;
 }
 
