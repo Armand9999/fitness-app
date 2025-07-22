@@ -142,6 +142,8 @@ export default function WeeklyProgress() {
         </div>
       )}
 
+      <p>Here&apos;s your weekly progress!</p>
+
       <div className="grid grid-cols-3 gap-4 text-center">
         <div>
           <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
