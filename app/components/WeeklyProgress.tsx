@@ -130,7 +130,7 @@ export default function WeeklyProgress() {
   return (
     <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-medium text-gray-900 dark:text-white">This Week's Progress</h3>
+        <h3 className="text-lg font-medium text-gray-900 dark:text-white">This Week&apos;s Progress</h3>
         {loading && (
           <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" aria-label="Loading"></div>
         )}
