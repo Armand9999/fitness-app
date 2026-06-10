@@ -43,12 +43,3 @@ export type FormState =
 
     }
 } | undefined
-
-export type Profile = {
-    age: string 
-    weight_kg: string
-    height_cm: string
-    gender: string
-    activity_level: string,
-    goal: string,
-}
