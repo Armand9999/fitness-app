@@ -1,67 +1,98 @@
 # FitTrack Pro
 
-A comprehensive fitness tracking application built with modern web technologies to help users achieve their health and fitness goals.
+FitTrack Pro is a Next.js fitness tracking application that combines Supabase authentication and persistence with AI-generated workout and meal plans.
 
 ## Features
 
-- **Workout Tracking**: Log and monitor your exercise routines
-- **Nutrition Management**: Track meals and calorie intake
-- **Water Intake**: Monitor daily hydration levels
-- **Progress Analytics**: Visualize your fitness journey with charts
-- **AI-Powered Recommendations**: Get personalized workout and meal suggestions
+- Email and password authentication with email verification
+- Fitness profile and TDEE calculation
+- Daily water intake tracking
+- Personalized workout generation and completed-workout tracking
+- Personalized daily meal-plan generation
+- Weekly progress summaries
 
 ## Tech Stack
 
-- **Frontend**: Next.js, TypeScript, Tailwind CSS
-- **Backend**: Supabase (Authentication, Database)
-- **AI Features**: OpenAI API integration
+- Next.js 15, React 19, and TypeScript
+- Tailwind CSS 4
+- Supabase Authentication, Database, and Realtime
+- OpenAI API
+- Node.js built-in test runner
 
-## Getting Started
+## Prerequisites
 
-### Prerequisites
+- Node.js 20 or newer
+- A Supabase project with the tables expected by the application
+- An OpenAI API key for workout and meal-plan generation
 
-- Node.js (v18+)
-- Supabase account
-- OpenAI API key
+> The database schema and Row Level Security policies are not yet versioned in this repository. Configure Supabase carefully before exposing the application to users. Browser database access relies on correct Row Level Security policies.
 
-### Installation
+## Local Setup
+
+1. Install dependencies:
+
+   ```bash
+   npm install
+   ```
+
+2. Create a local environment file from the documented template:
+
+   ```bash
+   cp .env.example .env.local
+   ```
+
+3. Fill in `.env.local` with your Supabase project values, application URL, and server-only OpenAI API key.
+
+4. Start the development server:
+
+   ```bash
+   npm run dev
+   ```
+
+5. Open [http://localhost:3000](http://localhost:3000).
+
+## Environment Variables
+
+| Variable | Scope | Purpose |
+| --- | --- | --- |
+| `NEXT_PUBLIC_SUPABASE_URL` | Browser and server | Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Browser and server | Supabase anonymous key; requires appropriate Row Level Security |
+| `NEXT_PUBLIC_SITE_URL` | Browser and server | Application origin used for authentication redirects |
+| `NEXT_APP_OPENAI_API_KEY` | Server only | OpenAI credential used to generate workouts and meal plans |
+
+Never commit `.env.local` or real credentials. The checked-in `.env.example` contains placeholders only.
+
+## Quality Checks
+
+Run the complete local quality gate:
 
 ```bash
-# Clone the repository
-git clone https://github.com/yourusername/fitness-app.git
-cd fitness-app
-
-# Install dependencies
-npm install
-
-# Set up environment variables
-cp .env.example .env.local
-# Edit .env.local with your API keys
+npm run check
+npm run build
 ```
 
-### Configuration
-
-Add the following to your `.env.local` file:
-
-```
-NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
-NEXT_PUBLIC_SITE_URL=http://localhost:3000
-NEXT_APP_OPENAI_API_KEY=your-openai-api-key
-```
-
-### Development
+Or run checks individually:
 
 ```bash
-npm run dev
+npm run lint
+npm run typecheck
+npm test
 ```
 
-Visit [http://localhost:3000](http://localhost:3000) to see the application.
+The test command compiles the selected TypeScript source and tests into the ignored `.test-dist` directory, then runs them with Node's built-in test runner. The baseline suite covers TDEE calculations and authentication schemas.
 
-## Documentation
+## Available Scripts
 
-For detailed documentation on components and API usage, see the [docs folder](/docs).
+| Command | Description |
+| --- | --- |
+| `npm run dev` | Start the development server with Turbopack |
+| `npm run build` | Create an optimized production build |
+| `npm run start` | Start a previously built production application |
+| `npm run lint` | Lint the repository with ESLint |
+| `npm run typecheck` | Run the TypeScript compiler without emitting files |
+| `npm test` | Compile and run the baseline unit tests |
+| `npm run check` | Run lint, type-checking, and unit tests |
 
-## License
+## Current Productionization Status
 
-MIT
+This repository is being hardened incrementally. The current baseline includes deterministic builds, explicit quality scripts, unit tests for core calculations and authentication validation, and documented environment setup. Upcoming work should version the Supabase schema and policies, strengthen profile validation, validate AI output, and add end-to-end coverage.
