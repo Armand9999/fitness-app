@@ -2,6 +2,7 @@
 
 import { type ProfileFieldErrors } from '@/app/lib/profile-options'
 import { ProfileSchema } from '@/app/lib/profile'
+import { calculateTDE } from '@/app/lib/tde'
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 
@@ -35,18 +36,31 @@ export async function createProfile(formData: FormData): Promise<ProfileActionRe
     return { success: false, message: 'You must be signed in to update your profile.' }
   }
 
-  const { error: saveError } = await supabase.rpc('save_profile_with_tde', {
-    profile_age: profile.age,
-    profile_weight_kg: profile.weight_kg,
-    profile_height_cm: profile.height_cm,
-    profile_gender: profile.gender,
-    profile_activity_level: profile.activity_level,
-    profile_goal: profile.goal,
+  const tde = calculateTDE({
+    weightKg: profile.weight_kg,
+    heightCm: profile.height_cm,
+    age: profile.age,
+    gender: profile.gender,
+    activityLevel: profile.activity_level,
   })
 
-  if (saveError) {
-    console.error('Failed to save profile and TDEE estimate:', saveError.message)
+  const { error: profileError } = await supabase
+    .from('profiles')
+    .upsert({ id: user.id, ...profile })
+
+  if (profileError) {
+    console.error('Failed to save profile:', profileError.message)
     return { success: false, message: 'We could not save your profile. Please try again.' }
+  }
+
+  // These writes should become one database transaction when migrations are introduced.
+  const { error: tdeError } = await supabase
+    .from('tde_estimates')
+    .insert({ user_id: user.id, tde_value: tde, method: 'Mifflin-St Jeor' })
+
+  if (tdeError) {
+    console.error('Failed to save TDEE estimate:', tdeError.message)
+    return { success: false, message: 'Your profile was saved, but its TDEE estimate could not be recorded.' }
   }
 
   redirect('/protected')
