@@ -79,7 +79,10 @@ export async function getMeal() {
                 throw new Error('Error fetching TDE data');
             }
             
-            const tdeeValue = tde_estimates?.tde_value || null;
+            const tdeeValue = tde_estimates?.tde_value;
+            if (!tdeeValue) {
+                throw new Error('A valid TDEE estimate is required to create a meal plan');
+            }
             const userGoal = profile?.goal || 'stay_fit';
 
             const prompt = `Create a personalized one-day meal plan based on the following profile:
@@ -124,7 +127,10 @@ Ensure meals are balanced, realistic, and align with the user's fitness goal and
             const calories_target = userGoal === 'lose_weight' ? tdeeValue - 500 :
                                     userGoal === 'build_muscle' ? tdeeValue + 300 : tdeeValue;
 
-            console.log(response.choices[0].message.content)
+            const mealContent = response.choices[0].message.content;
+            if (!mealContent) {
+                throw new Error('Meal plan generation returned no content');
+            }
 
             const { data: newMealPlan, error: insertError } = await supabase
                 .from('meal_plans')
@@ -133,7 +139,7 @@ Ensure meals are balanced, realistic, and align with the user's fitness goal and
                     date: today, 
                     goal: userGoal, 
                     calories_target: calories_target, 
-                    meals: response.choices[0].message.content 
+                    meals: mealContent
                 })
                 .select()
                 .single()

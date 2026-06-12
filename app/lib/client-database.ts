@@ -10,44 +10,17 @@ export async function updateWaterIntake(glasses: number) {
   
   const today = new Date().toISOString().split('T')[0]
   
-  // First check if a record exists for today
-  const { data: existingData } = await supabase
+  const { data, error } = await supabase
     .from('water_intake')
-    .select('*')
-    .eq('user_id', user.id)
-    .eq('date', today)
-    .maybeSingle()
-  
-  let result
-  
-  if (existingData) {
-    // Update existing record
-    const { data, error } = await supabase
-      .from('water_intake')
-      .update({ glasses_consumed: glasses })
-      .match({ id: existingData.id, user_id: user.id })
-      .select()
-      .single()
-    
-    if (error) throw error
-    result = data
-  } else {
-    // Insert new record
-    const { data, error } = await supabase
-      .from('water_intake')
-      .insert({
-        user_id: user.id,
-        date: today,
-        glasses_consumed: glasses
-      })
-      .select()
-      .single()
-    
-    if (error) throw error
-    result = data
-  }
-  
-  return result
+    .upsert(
+      { user_id: user.id, date: today, glasses_consumed: glasses },
+      { onConflict: 'user_id,date' },
+    )
+    .select()
+    .single()
+
+  if (error) throw error
+  return data
 }
 
 export async function getWaterIntake(date?: string) {
