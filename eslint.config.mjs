@@ -10,7 +10,7 @@ const compat = new FlatCompat({
 });
 
 const eslintConfig = [
-  { ignores: [".next/**", ".test-dist/**"] },
+  { ignores: [".next/**", ".test-dist/**", "supabase/remote-database.types.ts"] },
   ...compat.extends("next/core-web-vitals", "next/typescript"),
 ];
 

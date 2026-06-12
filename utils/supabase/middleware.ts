@@ -1,4 +1,5 @@
-import { createServerClient } from "@supabase/ssr";
+import { createServerClient, type SetAllCookies } from "@supabase/ssr";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 import type { Database } from "@/app/lib/database.types";
 import { type NextRequest, NextResponse } from "next/server";
@@ -15,7 +16,7 @@ export async function updateSession(request: NextRequest) {
         {
             cookies: {
                 getAll() { return request.cookies.getAll() },
-                setAll(cookiesToSet) {
+                setAll(cookiesToSet: Parameters<SetAllCookies>[0]) {
                     try {
                         cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
                         supabaseResponse = NextResponse.next({
@@ -28,7 +29,7 @@ export async function updateSession(request: NextRequest) {
                 },
             }
         }
-    )
+    ) as SupabaseClient<Database>
     
     // Get the user session
     // This will also update the session cookie if it has changed
