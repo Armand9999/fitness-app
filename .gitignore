@@ -42,6 +42,5 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# Supabase CLI local state and generated schema comparison artifacts
+# Supabase CLI local state
 /supabase/.temp/
-/supabase/remote-database.types.ts
