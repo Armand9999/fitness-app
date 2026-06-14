@@ -1,27 +1,41 @@
-export function calculateTDE(weight: number, height: number, age: number, gender: string, activity: string): number {
-  // Input validation
-  if (weight <= 0 || height <= 0 || age <= 0) {
-    throw new Error('Weight, height, and age must be positive numbers');
+import { ACTIVITY_LEVELS, GENDERS, type ActivityLevel, type Gender } from './profile-options'
+
+export interface TDEInput {
+  weightKg: number
+  heightCm: number
+  age: number
+  gender: Gender
+  activityLevel: ActivityLevel
+}
+
+const activityMultipliers: Record<ActivityLevel, number> = {
+  sedentary: 1.2,
+  lightly_active: 1.375,
+  moderately_active: 1.55,
+  very_active: 1.725,
+  extra_active: 1.9,
+}
+
+export function calculateTDE({
+  weightKg,
+  heightCm,
+  age,
+  gender,
+  activityLevel,
+}: TDEInput): number {
+  if (![weightKg, heightCm, age].every(Number.isFinite) || weightKg <= 0 || heightCm <= 0 || age <= 0) {
+    throw new Error('Weight, height, and age must be positive finite numbers')
   }
-  if (gender !== 'male' && gender !== 'female') {
-    throw new Error('Gender must be either "male" or "female"');
+  if (!GENDERS.includes(gender)) {
+    throw new Error('Gender must be either "male" or "female"')
   }
-  if (!['sedentary', 'lightly_active', 'moderately_active', 'very_active', 'extra_active'].includes(activity)) {
-    throw new Error('Invalid activity level');
+  if (!ACTIVITY_LEVELS.includes(activityLevel)) {
+    throw new Error('Invalid activity level')
   }
 
   const bmr = gender === 'male'
-    ? 10 * weight + 6.25 * height - 5 * age + 5
-    : 10 * weight + 6.25 * height - 5 * age - 161
+    ? 10 * weightKg + 6.25 * heightCm - 5 * age + 5
+    : 10 * weightKg + 6.25 * heightCm - 5 * age - 161
 
-
-  const activityMultiplier: Record<string, number> = {
-    sedentary: 1.2,
-    lightly_active: 1.375,
-    moderately_active: 1.55,
-    very_active: 1.725,
-    extra_active: 1.9,
-  }
-
-  return Math.round(bmr * (activityMultiplier[activity] || 1.2))
+  return Math.round(bmr * activityMultipliers[activityLevel])
 }
