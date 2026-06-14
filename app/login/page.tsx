@@ -90,6 +90,11 @@ export default function LoginForm() {
               {state?.errors?.password && (
                 <p className="mt-2 text-sm text-red-600 dark:text-red-400">{state.errors.password}</p>
               )}
+              <div className="mt-2 text-right">
+                <Link href="/forgot-password" className="text-sm font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300">
+                  Forgot your password?
+                </Link>
+              </div>
             </div>
 
             <div>

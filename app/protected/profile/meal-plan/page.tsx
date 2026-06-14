@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { getMeal, regenerateMealPlan } from './action'
 import Link from 'next/link'
+import { parseMealPlanContent } from '@/app/lib/generated-plans'
 
 export default function MealPlanPage() {
   const [plan, setPlan] = useState<{
@@ -64,9 +65,16 @@ export default function MealPlanPage() {
     </div>
   )
 
-  // Parse meals if it's stored as a JSON string
-  const mealsData = typeof plan.meals === 'string' ? JSON.parse(plan.meals) : plan.meals
-  const meals = mealsData?.Meals || mealsData
+  let meals
+  try {
+    meals = parseMealPlanContent(plan.meals).Meals
+  } catch {
+    return (
+      <div className="max-w-xl mx-auto p-6 bg-red-50 dark:bg-red-900/20 rounded-lg">
+        <p className="text-red-600 dark:text-red-400">The saved meal plan is invalid. Generate a new plan to continue.</p>
+      </div>
+    )
+  }
 
   const mealIcons = {
     Breakfast: "🍳",
