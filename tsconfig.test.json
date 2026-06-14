@@ -9,6 +9,6 @@
     "target": "ES2020",
     "types": ["node"]
   },
-  "include": ["app/lib/definitions.ts", "app/lib/auth.ts", "app/lib/profile-options.ts", "app/lib/profile.ts", "app/lib/tde.ts", "app/lib/generated-plans.ts", "tests/**/*.test.ts"],
+  "include": ["app/lib/definitions.ts", "app/lib/date.ts", "app/lib/auth.ts", "app/lib/profile-options.ts", "app/lib/profile.ts", "app/lib/tde.ts", "app/lib/generated-plans.ts", "tests/**/*.test.ts"],
   "exclude": ["node_modules"]
 }

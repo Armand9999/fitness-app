@@ -1,5 +1,6 @@
 'use client'
 
+import { getLocalDateKey, parseDateKey } from "@/app/lib/date"
 import { createClient } from "@/utils/supabase/client"
 
 export async function updateWaterIntake(glasses: number) {
@@ -8,7 +9,7 @@ export async function updateWaterIntake(glasses: number) {
   
   if (!user) throw new Error('Not authenticated')
   
-  const today = new Date().toISOString().split('T')[0]
+  const today = getLocalDateKey()
   
   const { data, error } = await supabase
     .from('water_intake')
@@ -29,7 +30,7 @@ export async function getWaterIntake(date?: string) {
   
   if (!user) throw new Error('Not authenticated')
   
-  const targetDate = date || new Date().toISOString().split('T')[0]
+  const targetDate = date ? parseDateKey(date) : getLocalDateKey()
   
   const { data, error } = await supabase
     .from('water_intake')
@@ -75,13 +76,13 @@ export async function saveWorkoutSession(workout: {
   return data
 }
 
-export async function getTodayWorkoutPlan() {
+export async function getTodayWorkoutPlan(date = getLocalDateKey()) {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
   
   if (!user) throw new Error('Not authenticated')
   
-  const today = new Date().toISOString().split('T')[0]
+  const today = parseDateKey(date)
   
   const { data, error } = await supabase
     .from('workout_plans')

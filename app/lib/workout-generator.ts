@@ -2,6 +2,7 @@
 
 import OpenAI from 'openai'
 
+import { parseDateKey } from '@/app/lib/date'
 import { GeneratedWorkoutPlanSchema, WorkoutDurationSchema, parseGeneratedContent } from '@/app/lib/generated-plans'
 import { ProfileSchema } from '@/app/lib/profile'
 import { createClient } from '@/utils/supabase/server'
@@ -12,13 +13,13 @@ const openai = new OpenAI({
   timeout: 30_000,
 })
 
-async function createAndSaveWorkoutPlan(durationInput: number) {
+async function createAndSaveWorkoutPlan(durationInput: number, dateInput: string) {
   const duration = WorkoutDurationSchema.parse(durationInput)
+  const date = parseDateKey(dateInput)
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Not logged in')
 
-  const today = new Date().toISOString().split('T')[0]
   const { data: profileData, error: profileError } = await supabase
     .from('profiles')
     .select('*')
@@ -48,7 +49,7 @@ async function createAndSaveWorkoutPlan(durationInput: number) {
     .from('workout_plans')
     .upsert({
       user_id: user.id,
-      date: today,
+      date,
       workout_type: workoutData.workout_type,
       duration_minutes: duration,
       difficulty: workoutData.difficulty,
@@ -61,29 +62,29 @@ async function createAndSaveWorkoutPlan(durationInput: number) {
   return plan
 }
 
-export async function generateWorkoutPlan(duration: number = 30) {
+export async function generateWorkoutPlan(duration: number, dateInput: string) {
   const validatedDuration = WorkoutDurationSchema.parse(duration)
+  const date = parseDateKey(dateInput)
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Not logged in')
 
-  const today = new Date().toISOString().split('T')[0]
   const { data: existing, error } = await supabase
     .from('workout_plans')
     .select('*')
     .eq('user_id', user.id)
-    .eq('date', today)
+    .eq('date', date)
     .maybeSingle()
 
   if (error) throw new Error('Failed to load workout plan')
   if (existing) return existing
 
-  return createAndSaveWorkoutPlan(validatedDuration)
+  return createAndSaveWorkoutPlan(validatedDuration, date)
 }
 
-export async function regenerateWorkoutPlan(duration: number = 30) {
+export async function regenerateWorkoutPlan(duration: number, dateInput: string) {
   try {
-    return await createAndSaveWorkoutPlan(duration)
+    return await createAndSaveWorkoutPlan(duration, parseDateKey(dateInput))
   } catch (error) {
     console.error('Error regenerating workout plan:', error)
     throw new Error('Failed to regenerate workout plan')

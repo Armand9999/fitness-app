@@ -130,4 +130,4 @@ The test command compiles the selected TypeScript source and tests into the igno
 
 ## Current Productionization Status
 
-This repository is being hardened incrementally. The current baseline includes deterministic builds, explicit quality scripts, validated authentication recovery, profile and TDEE domains, versioned Supabase schema and Row Level Security policies, and documented environment setup. AI-generated workout and meal-plan output is now validated before persistence and regeneration is non-destructive. Upcoming work should correct timezone handling, add end-to-end coverage, and introduce production observability.
+This repository is being hardened incrementally. The current baseline includes deterministic builds, explicit quality scripts, validated authentication recovery, profile and TDEE domains, user-local daily tracking, versioned Supabase schema and Row Level Security policies, and documented environment setup. AI-generated workout and meal-plan output is now validated before persistence and regeneration is non-destructive. Upcoming work should add end-to-end coverage, introduce production observability, and automate deployment controls.

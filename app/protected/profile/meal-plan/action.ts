@@ -2,6 +2,7 @@
 
 import OpenAI from 'openai'
 
+import { parseDateKey } from '@/app/lib/date'
 import { MealPlanContentSchema, parseGeneratedContent } from '@/app/lib/generated-plans'
 import { ProfileSchema } from '@/app/lib/profile'
 import { createClient } from '@/utils/supabase/server'
@@ -12,12 +13,12 @@ const openai = new OpenAI({
   timeout: 30_000,
 })
 
-async function createAndSaveMealPlan() {
+async function createAndSaveMealPlan(dateInput: string) {
+  const date = parseDateKey(dateInput)
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Not logged in')
 
-  const today = new Date().toISOString().split('T')[0]
   const { data: profileData, error: profileError } = await supabase
     .from('profiles')
     .select('*')
@@ -61,7 +62,7 @@ async function createAndSaveMealPlan() {
     .from('meal_plans')
     .upsert({
       user_id: user.id,
-      date: today,
+      date,
       goal: profile.goal,
       calories_target: caloriesTarget,
       meals,
@@ -73,33 +74,33 @@ async function createAndSaveMealPlan() {
   return mealPlan
 }
 
-export async function regenerateMealPlan() {
+export async function regenerateMealPlan(dateInput: string) {
   try {
-    return await createAndSaveMealPlan()
+    return await createAndSaveMealPlan(dateInput)
   } catch (error) {
     console.error('Meal plan regeneration error:', error)
     throw new Error('Failed to regenerate meal plan')
   }
 }
 
-export async function getMeal() {
+export async function getMeal(dateInput: string) {
+  const date = parseDateKey(dateInput)
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Not logged in')
 
-  const today = new Date().toISOString().split('T')[0]
   const { data: mealPlan, error } = await supabase
     .from('meal_plans')
     .select('*')
     .eq('user_id', user.id)
-    .eq('date', today)
+    .eq('date', date)
     .maybeSingle()
 
   if (error) throw new Error('Error fetching meal plan')
   if (mealPlan) return mealPlan
 
   try {
-    return await createAndSaveMealPlan()
+    return await createAndSaveMealPlan(date)
   } catch (generationError) {
     console.error('Meal plan generation error:', generationError)
     throw new Error('Failed to generate meal plan')

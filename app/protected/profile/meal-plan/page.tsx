@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { getMeal, regenerateMealPlan } from './action'
 import Link from 'next/link'
+import { getLocalDateKey } from '@/app/lib/date'
 import { parseMealPlanContent } from '@/app/lib/generated-plans'
 
 export default function MealPlanPage() {
@@ -19,7 +20,7 @@ export default function MealPlanPage() {
   useEffect(() => {
     async function fetchMealPlan() {
       try {
-        const mealPlan = await getMeal()
+        const mealPlan = await getMeal(getLocalDateKey())
         setPlan(mealPlan)
       } catch (err) {
         setError('Failed to load meal plan')
@@ -35,7 +36,7 @@ export default function MealPlanPage() {
   const handleRegenerate = async () => {
     setRegenerating(true)
     try {
-      const newPlan = await regenerateMealPlan()
+      const newPlan = await regenerateMealPlan(getLocalDateKey())
       setPlan(newPlan)
     } catch (error) {
       setError('Failed to regenerate meal plan')
