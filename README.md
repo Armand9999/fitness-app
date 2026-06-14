@@ -62,6 +62,9 @@ The versioned Supabase schema in `supabase/migrations` defines the application t
 
 Never commit `.env.local` or real credentials. The checked-in `.env.example` contains placeholders only.
 
+## Authentication Redirects
+
+Add the deployed application origin and `/auth/confirm` callback to the Supabase Authentication URL configuration. Password recovery sends users through `/auth/confirm?next=/reset-password`; the callback verifies either PKCE codes or email OTP token hashes and only permits local redirect paths.
 
 ## Supabase Database
 
@@ -111,7 +114,7 @@ npm run typecheck
 npm test
 ```
 
-The test command compiles the selected TypeScript source and tests into the ignored `.test-dist` directory, then runs them with Node's built-in test runner. The baseline suite covers authentication and profile schemas, TDEE calculations, and the required migration contract.
+The test command compiles the selected TypeScript source and tests into the ignored `.test-dist` directory, then runs them with Node's built-in test runner. The baseline suite covers authentication and profile schemas, TDEE calculations, generated workout and meal-plan validation, Supabase client contracts, and the required migration contract.
 
 ## Available Scripts
 
@@ -127,4 +130,4 @@ The test command compiles the selected TypeScript source and tests into the igno
 
 ## Current Productionization Status
 
-This repository is being hardened incrementally. The current baseline includes deterministic builds, explicit quality scripts, validated profile and TDEE domains, versioned Supabase schema and Row Level Security policies, and documented environment setup. Upcoming work should validate AI output, correct timezone handling, and add end-to-end coverage.
+This repository is being hardened incrementally. The current baseline includes deterministic builds, explicit quality scripts, validated authentication recovery, profile and TDEE domains, versioned Supabase schema and Row Level Security policies, and documented environment setup. AI-generated workout and meal-plan output is now validated before persistence and regeneration is non-destructive. Upcoming work should correct timezone handling, add end-to-end coverage, and introduce production observability.
