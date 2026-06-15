@@ -104,6 +104,7 @@ Run the complete local quality gate:
 ```bash
 npm run check
 npm run build
+npm run test:e2e
 ```
 
 Or run checks individually:
@@ -127,7 +128,9 @@ The test command compiles the selected TypeScript source and tests into the igno
 | `npm run typecheck` | Run the TypeScript compiler without emitting files |
 | `npm test` | Compile and run the baseline unit tests |
 | `npm run check` | Run lint, type-checking, and unit tests |
+| `npm run test:e2e` | Run Playwright public authentication journeys in Chromium |
+| `npm run ci` | Run checks, production build, and end-to-end tests |
 
 ## Current Productionization Status
 
-This repository is being hardened incrementally. The current baseline includes deterministic builds, explicit quality scripts, validated authentication recovery, profile and TDEE domains, user-local daily tracking, versioned Supabase schema and Row Level Security policies, and documented environment setup. AI-generated workout and meal-plan output is now validated before persistence and regeneration is non-destructive. Upcoming work should add end-to-end coverage, introduce production observability, and automate deployment controls.
+This repository is being hardened incrementally. The current baseline includes deterministic builds, explicit quality scripts, validated authentication recovery, profile and TDEE domains, user-local daily tracking, versioned Supabase schema and Row Level Security policies, and documented environment setup. AI-generated workout and meal-plan output is now validated before persistence and regeneration is non-destructive. Public authentication journeys now have Playwright end-to-end coverage and run in CI. Upcoming work should add authenticated Supabase E2E fixtures, introduce production observability, and automate deployment controls.
