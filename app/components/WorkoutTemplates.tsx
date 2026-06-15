@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { saveWorkoutSession, getTodayWorkoutPlan } from '@/app/lib/client-database'
 import { generateWorkoutPlan, regenerateWorkoutPlan } from '@/app/lib/workout-generator'
+import { getLocalDateKey } from '@/app/lib/date'
 
 type Exercise = {
   name: string;
@@ -31,9 +32,10 @@ export default function WorkoutTemplates() {
   useEffect(() => {
     async function loadWorkout() {
       try {
-        let plan = await getTodayWorkoutPlan()
+        const today = getLocalDateKey()
+        let plan = await getTodayWorkoutPlan(today)
         if (!plan) {
-          plan = await generateWorkoutPlan(30)
+          plan = await generateWorkoutPlan(30, today)
         }
         setWorkoutPlan(plan)
         setError(null) // Clear any previous errors
@@ -51,7 +53,7 @@ export default function WorkoutTemplates() {
     setRegenerating(true)
     setError(null) 
     try {
-      const newPlan = await regenerateWorkoutPlan(30)
+      const newPlan = await regenerateWorkoutPlan(30, getLocalDateKey())
       setWorkoutPlan(newPlan)
       setCompletedExercises([])
       setSelectedExercise(null)

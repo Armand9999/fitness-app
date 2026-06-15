@@ -1,4 +1,7 @@
-import { createServerClient } from "@supabase/ssr";
+import { createServerClient, type SetAllCookies } from "@supabase/ssr";
+import type { SupabaseClient } from "@supabase/supabase-js";
+
+import type { Database } from "@/app/lib/database.types";
 import { type NextRequest, NextResponse } from "next/server";
 
 export async function updateSession(request: NextRequest) {
@@ -13,7 +16,7 @@ export async function updateSession(request: NextRequest) {
         {
             cookies: {
                 getAll() { return request.cookies.getAll() },
-                setAll(cookiesToSet) {
+                setAll(cookiesToSet: Parameters<SetAllCookies>[0]) {
                     try {
                         cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
                         supabaseResponse = NextResponse.next({
@@ -26,19 +29,32 @@ export async function updateSession(request: NextRequest) {
                 },
             }
         }
-    )
+    ) as SupabaseClient<Database>
     
-    // Get the user session
-    // This will also update the session cookie if it has changed
+    const requiresAuthentication = request.nextUrl.pathname.startsWith("/protected")
+    const redirectsAuthenticatedUser = request.nextUrl.pathname === "/"
+
+    // Public routes do not need a remote auth check. This keeps them available
+    // during transient Supabase outages and makes public journeys deterministic.
+    if (!requiresAuthentication && !redirectsAuthenticatedUser) {
+        return supabaseResponse
+    }
+
+    const hasAuthCookie = request.cookies.getAll().some(({ name }) =>
+        name.startsWith("sb-") && name.includes("auth-token")
+    )
+    if (redirectsAuthenticatedUser && !hasAuthCookie) {
+        return supabaseResponse
+    }
 
     const user = await supabase.auth.getUser();
 
-    if (request.nextUrl.pathname.startsWith("/protected") && user.error) {
+    if (requiresAuthentication && user.error) {
         // If the user is not authenticated, redirect to the login page
         return NextResponse.redirect(new URL(`/login`, request.url));
     }
 
-    if(request.nextUrl.pathname === "/" && !user.error) {
+    if(redirectsAuthenticatedUser && !user.error) {
         // If the user is authenticated and trying to access the home page, redirect to the protected page
         return NextResponse.redirect(new URL(`/protected`, request.url));
     }
