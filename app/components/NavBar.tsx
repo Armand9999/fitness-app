@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { SignOut } from "./SignOut";
 import { User } from "@supabase/supabase-js";
@@ -13,10 +14,11 @@ export function NavBar({ user }: NavBarProps) {
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-2">
-              <img 
-                src="/logo.svg" 
-                alt="FitTrack Pro Logo" 
-                className="w-8 h-8" 
+              <Image
+                src="/logo.svg"
+                alt="FitTrack Pro Logo"
+                width={32}
+                height={32}
               />
               <span className="text-xl font-bold text-gray-800 dark:text-white">
                 FitTrack Pro
