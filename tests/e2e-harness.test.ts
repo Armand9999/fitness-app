@@ -24,6 +24,12 @@ describe('end-to-end harness contract', () => {
     assert.doesNotMatch(publicAuthSpec, /process\.env\.(?:E2E|TEST)_/)
   })
 
+  it('uses unambiguous accessible locators for repeated auth labels and alerts', () => {
+    assert.match(publicAuthSpec, /name: 'Log in', exact: true/)
+    assert.match(publicAuthSpec, /getByLabel\('New password', \{ exact: true \}\)/)
+    assert.match(publicAuthSpec, /getByRole\('alert'\)\.filter\(\{ hasText:/)
+  })
+
   it('runs checks, build, and Playwright in CI and uploads failures', () => {
     assert.match(workflow, /npm run check/)
     assert.match(workflow, /npm run build/)

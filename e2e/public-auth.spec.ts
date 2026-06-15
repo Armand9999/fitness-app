@@ -8,7 +8,7 @@ test.describe('public authentication journeys', () => {
     await page.getByRole('link', { name: 'Get started' }).click()
     await expect(page.getByRole('heading', { name: 'Create your account' })).toBeVisible()
 
-    await page.getByRole('link', { name: 'Log in' }).click()
+    await page.getByRole('link', { name: 'Log in', exact: true }).last().click()
     await expect(page.getByRole('heading', { name: 'Welcome back' })).toBeVisible()
   })
 
@@ -20,13 +20,13 @@ test.describe('public authentication journeys', () => {
     await page.locator('form').evaluate((form) => { form.noValidate = true })
     await page.getByLabel('Email address').fill('invalid-email')
     await page.getByRole('button', { name: 'Send reset link' }).click()
-    await expect(page.getByRole('alert')).toContainText('valid email address')
+    await expect(page.getByRole('alert').filter({ hasText: 'valid email address' })).toBeVisible()
   })
 
   test('validates replacement password strength and confirmation', async ({ page }) => {
     await page.goto('/reset-password')
-    await page.getByLabel('New password').fill('weak')
-    await page.getByLabel('Confirm new password').fill('different')
+    await page.getByLabel('New password', { exact: true }).fill('weak')
+    await page.getByLabel('Confirm new password', { exact: true }).fill('different')
     await page.getByRole('button', { name: 'Update password' }).click()
 
     await expect(page.getByText('Password must be at least 8 characters long.')).toBeVisible()
