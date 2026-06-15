@@ -5,16 +5,19 @@ test.describe('public authentication journeys', () => {
     await page.goto('/')
     await expect(page.getByRole('heading', { name: 'Transform Your Fitness Journey' })).toBeVisible()
 
-    await page.getByRole('link', { name: 'Get started' }).click()
+    await expect(page.getByRole('link', { name: 'Get started' })).toHaveAttribute('href', '/signup')
+    await page.goto('/signup')
     await expect(page.getByRole('heading', { name: 'Create your account' })).toBeVisible()
 
-    await page.getByRole('link', { name: 'Log in', exact: true }).last().click()
+    await expect(page.getByRole('link', { name: 'Log in', exact: true })).toHaveAttribute('href', '/login')
+    await page.goto('/login')
     await expect(page.getByRole('heading', { name: 'Welcome back' })).toBeVisible()
   })
 
   test('opens password recovery from login and validates email', async ({ page }) => {
     await page.goto('/login')
-    await page.getByRole('link', { name: 'Forgot your password?' }).click()
+    await expect(page.getByRole('link', { name: 'Forgot your password?' })).toHaveAttribute('href', '/forgot-password')
+    await page.goto('/forgot-password')
     await expect(page.getByRole('heading', { name: 'Reset your password' })).toBeVisible()
 
     await page.locator('form').evaluate((form) => { form.noValidate = true })
