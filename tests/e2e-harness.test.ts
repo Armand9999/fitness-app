@@ -6,8 +6,11 @@ const packageJson = JSON.parse(readFileSync('package.json', 'utf8'))
 const workflow = readFileSync('.github/workflows/quality.yml', 'utf8')
 const playwrightConfig = readFileSync('playwright.config.ts', 'utf8')
 const publicAuthSpec = readFileSync('e2e/public-auth.spec.ts', 'utf8')
+const authSetup = readFileSync('e2e/auth.setup.ts', 'utf8')
+const protectedFlowSpec = readFileSync('e2e/protected-flow.spec.ts', 'utf8')
 const middlewareHelper = readFileSync('utils/supabase/middleware.ts', 'utf8')
 const middleware = readFileSync('middleware.ts', 'utf8')
+const gitignore = readFileSync('.gitignore', 'utf8')
 
 describe('end-to-end harness contract', () => {
   it('defines deterministic Playwright scripts and failure artifacts', () => {
@@ -28,6 +31,19 @@ describe('end-to-end harness contract', () => {
     assert.match(publicAuthSpec, /name: 'Log in', exact: true/)
     assert.match(publicAuthSpec, /getByLabel\('New password', \{ exact: true \}\)/)
     assert.match(publicAuthSpec, /getByRole\('alert'\)\.filter\(\{ hasText:/)
+  })
+
+  it('adds authenticated protected-flow coverage only when E2E credentials are configured', () => {
+    assert.match(playwrightConfig, /hasAuthenticatedE2ECredentials/)
+    assert.match(playwrightConfig, /E2E_AUTH_EMAIL/)
+    assert.match(playwrightConfig, /E2E_AUTH_PASSWORD/)
+    assert.match(playwrightConfig, /name: 'authenticated setup'/)
+    assert.match(playwrightConfig, /name: 'authenticated'/)
+    assert.match(playwrightConfig, /storageState: authFile/)
+    assert.match(authSetup, /storageState\(\{ path: authFile \}\)/)
+    assert.match(protectedFlowSpec, /page\.goto\('\/protected'\)/)
+    assert.match(protectedFlowSpec, /page\.goto\('\/protected\/profile'\)/)
+    assert.match(gitignore, /\/playwright\/\.auth\//)
   })
 
   it('runs checks, build, and Playwright in CI and uploads failures', () => {

@@ -1,7 +1,33 @@
-import { defineConfig, devices } from '@playwright/test'
+import { defineConfig, devices, type PlaywrightTestConfig } from '@playwright/test'
 
 const port = Number(process.env.PORT ?? 3000)
 const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? `http://127.0.0.1:${port}`
+const authFile = 'playwright/.auth/user.json'
+const hasAuthenticatedE2ECredentials = Boolean(process.env.E2E_AUTH_EMAIL && process.env.E2E_AUTH_PASSWORD)
+
+const projects: PlaywrightTestConfig['projects'] = [
+  {
+    name: 'public-auth',
+    testMatch: /public-auth\.spec\.ts/,
+    use: { ...devices['Desktop Chrome'] },
+  },
+]
+
+if (hasAuthenticatedE2ECredentials) {
+  projects.push(
+    {
+      name: 'authenticated setup',
+      testMatch: /auth\.setup\.ts/,
+      use: { ...devices['Desktop Chrome'] },
+    },
+    {
+      name: 'authenticated',
+      testMatch: /protected-flow\.spec\.ts/,
+      dependencies: ['authenticated setup'],
+      use: { ...devices['Desktop Chrome'], storageState: authFile },
+    },
+  )
+}
 
 export default defineConfig({
   testDir: './e2e',
@@ -16,9 +42,7 @@ export default defineConfig({
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
   },
-  projects: [
-    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
-  ],
+  projects,
   webServer: process.env.PLAYWRIGHT_BASE_URL ? undefined : {
     command: `npm run dev -- --hostname 127.0.0.1 --port ${port}`,
     url: baseURL,

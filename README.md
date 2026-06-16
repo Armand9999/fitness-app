@@ -59,6 +59,8 @@ The versioned Supabase schema in `supabase/migrations` defines the application t
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Browser and server | Supabase anonymous key; requires appropriate Row Level Security |
 | `NEXT_PUBLIC_SITE_URL` | Browser and server | Application origin used for authentication redirects |
 | `NEXT_APP_OPENAI_API_KEY` | Server only | OpenAI credential used to generate workouts and meal plans |
+| `E2E_AUTH_EMAIL` | Local/CI test runner only | Optional dedicated Supabase test-user email for authenticated Playwright flows |
+| `E2E_AUTH_PASSWORD` | Local/CI test runner only | Optional dedicated Supabase test-user password for authenticated Playwright flows |
 
 Never commit `.env.local` or real credentials. The checked-in `.env.example` contains placeholders only.
 
@@ -117,6 +119,8 @@ npm test
 
 The test command compiles the selected TypeScript source and tests into the ignored `.test-dist` directory, then runs them with Node's built-in test runner. The baseline suite covers authentication and profile schemas, TDEE calculations, generated workout and meal-plan validation, Supabase client contracts, and the required migration contract.
 
+Playwright always runs the public authentication journeys. Authenticated protected-flow tests are included automatically only when both `E2E_AUTH_EMAIL` and `E2E_AUTH_PASSWORD` are set. Use a dedicated non-production Supabase user, keep those values in `.env.local` or CI secrets, and never commit real credentials. The authenticated setup stores browser state under the ignored `playwright/.auth/` directory.
+
 ## Available Scripts
 
 | Command | Description |
@@ -128,9 +132,9 @@ The test command compiles the selected TypeScript source and tests into the igno
 | `npm run typecheck` | Run the TypeScript compiler without emitting files |
 | `npm test` | Compile and run the baseline unit tests |
 | `npm run check` | Run lint, type-checking, and unit tests |
-| `npm run test:e2e` | Run Playwright public authentication journeys in Chromium |
+| `npm run test:e2e` | Run Playwright public journeys and, when E2E credentials are configured, authenticated protected-flow checks in Chromium |
 | `npm run ci` | Run checks, production build, and end-to-end tests |
 
 ## Current Productionization Status
 
-This repository is being hardened incrementally. The current baseline includes deterministic builds, explicit quality scripts, validated authentication recovery, profile and TDEE domains, user-local daily tracking, versioned Supabase schema and Row Level Security policies, and documented environment setup. AI-generated workout and meal-plan output is now validated before persistence and regeneration is non-destructive. Public authentication journeys now have Playwright end-to-end coverage and run in CI. Upcoming work should add authenticated Supabase E2E fixtures, introduce production observability, and automate deployment controls.
+This repository is being hardened incrementally. The current baseline includes deterministic builds, explicit quality scripts, validated authentication recovery, profile and TDEE domains, user-local daily tracking, versioned Supabase schema and Row Level Security policies, and documented environment setup. AI-generated workout and meal-plan output is now validated before persistence and regeneration is non-destructive. Public authentication journeys run in CI, and authenticated Supabase protected-flow smoke tests run whenever dedicated E2E credentials are configured. Upcoming work should introduce production observability, mocked AI generation E2E coverage, and automated deployment controls.

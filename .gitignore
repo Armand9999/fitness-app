@@ -13,6 +13,7 @@
 # testing
 /coverage
 /.test-dist
+/playwright/.auth/
 /playwright-report/
 /test-results/
 
