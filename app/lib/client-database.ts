@@ -1,5 +1,6 @@
 'use client'
 
+import { getLocalDateKey, parseDateKey } from "@/app/lib/date"
 import { createClient } from "@/utils/supabase/client"
 
 export async function updateWaterIntake(glasses: number) {
@@ -8,46 +9,19 @@ export async function updateWaterIntake(glasses: number) {
   
   if (!user) throw new Error('Not authenticated')
   
-  const today = new Date().toISOString().split('T')[0]
+  const today = getLocalDateKey()
   
-  // First check if a record exists for today
-  const { data: existingData } = await supabase
+  const { data, error } = await supabase
     .from('water_intake')
-    .select('*')
-    .eq('user_id', user.id)
-    .eq('date', today)
-    .maybeSingle()
-  
-  let result
-  
-  if (existingData) {
-    // Update existing record
-    const { data, error } = await supabase
-      .from('water_intake')
-      .update({ glasses_consumed: glasses })
-      .match({ id: existingData.id, user_id: user.id })
-      .select()
-      .single()
-    
-    if (error) throw error
-    result = data
-  } else {
-    // Insert new record
-    const { data, error } = await supabase
-      .from('water_intake')
-      .insert({
-        user_id: user.id,
-        date: today,
-        glasses_consumed: glasses
-      })
-      .select()
-      .single()
-    
-    if (error) throw error
-    result = data
-  }
-  
-  return result
+    .upsert(
+      { user_id: user.id, date: today, glasses_consumed: glasses },
+      { onConflict: 'user_id,date' },
+    )
+    .select()
+    .single()
+
+  if (error) throw error
+  return data
 }
 
 export async function getWaterIntake(date?: string) {
@@ -56,7 +30,7 @@ export async function getWaterIntake(date?: string) {
   
   if (!user) throw new Error('Not authenticated')
   
-  const targetDate = date || new Date().toISOString().split('T')[0]
+  const targetDate = date ? parseDateKey(date) : getLocalDateKey()
   
   const { data, error } = await supabase
     .from('water_intake')
@@ -102,13 +76,13 @@ export async function saveWorkoutSession(workout: {
   return data
 }
 
-export async function getTodayWorkoutPlan() {
+export async function getTodayWorkoutPlan(date = getLocalDateKey()) {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
   
   if (!user) throw new Error('Not authenticated')
   
-  const today = new Date().toISOString().split('T')[0]
+  const today = parseDateKey(date)
   
   const { data, error } = await supabase
     .from('workout_plans')

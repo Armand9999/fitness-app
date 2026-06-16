@@ -8,9 +8,11 @@ export async function middleware(request: NextRequest) {
     } catch (error) {
         console.error('Session update error:', error)
         
-        // Return the original request to continue the middleware chain
-        // This allows the application to function even if session update fails
-        return request.nextUrl ? NextResponse.redirect(request.nextUrl) : NextResponse.next()
+        // Fail closed for protected routes, while public routes remain available.
+        if (request.nextUrl.pathname.startsWith("/protected")) {
+            return NextResponse.redirect(new URL("/login", request.url))
+        }
+        return NextResponse.next()
     }
 }
 
