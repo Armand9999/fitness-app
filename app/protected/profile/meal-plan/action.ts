@@ -3,6 +3,7 @@
 import OpenAI from 'openai'
 
 import { parseDateKey } from '@/app/lib/date'
+import { getMockMealPlanContent, isE2EAIMockEnabled } from '@/app/lib/e2e-ai-fixtures'
 import { MealPlanContentSchema, parseGeneratedContent } from '@/app/lib/generated-plans'
 import { ProfileSchema } from '@/app/lib/profile'
 import { createClient } from '@/utils/supabase/server'
@@ -42,16 +43,20 @@ async function createAndSaveMealPlan(dateInput: string) {
     throw new Error('A valid TDEE estimate is required to create a meal plan')
   }
 
-  const prompt = `Create a balanced, realistic one-day meal plan for a user with goal ${profile.goal}, gender ${profile.gender}, weight ${profile.weight_kg} kg, height ${profile.height_cm} cm, activity level ${profile.activity_level}, and TDEE ${tdeEstimate.tde_value} calories. Return a JSON object with a Meals object containing non-empty Breakfast, Lunch, Dinner, and Snacks strings with specific portions.`
-
-  const response = await openai.chat.completions.create({
-    model: 'gpt-4.1',
-    messages: [{ role: 'system', content: prompt }],
-    response_format: { type: 'json_object' },
-    temperature: 0.7,
-  })
-
-  const meals = parseGeneratedContent(response.choices[0]?.message.content, MealPlanContentSchema)
+  const meals = isE2EAIMockEnabled()
+    ? getMockMealPlanContent()
+    : parseGeneratedContent(
+      (await openai.chat.completions.create({
+        model: 'gpt-4.1',
+        messages: [{
+          role: 'system',
+          content: `Create a balanced, realistic one-day meal plan for a user with goal ${profile.goal}, gender ${profile.gender}, weight ${profile.weight_kg} kg, height ${profile.height_cm} cm, activity level ${profile.activity_level}, and TDEE ${tdeEstimate.tde_value} calories. Return a JSON object with a Meals object containing non-empty Breakfast, Lunch, Dinner, and Snacks strings with specific portions.`,
+        }],
+        response_format: { type: 'json_object' },
+        temperature: 0.7,
+      })).choices[0]?.message.content,
+      MealPlanContentSchema,
+    )
   const caloriesTarget = profile.goal === 'lose_weight'
     ? tdeEstimate.tde_value - 500
     : profile.goal === 'build_muscle'

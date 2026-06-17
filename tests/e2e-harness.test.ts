@@ -8,9 +8,13 @@ const playwrightConfig = readFileSync('playwright.config.ts', 'utf8')
 const publicAuthSpec = readFileSync('e2e/public-auth.spec.ts', 'utf8')
 const authSetup = readFileSync('e2e/auth.setup.ts', 'utf8')
 const protectedFlowSpec = readFileSync('e2e/protected-flow.spec.ts', 'utf8')
+const mockedGenerationSpec = readFileSync('e2e/mocked-generation.spec.ts', 'utf8')
 const middlewareHelper = readFileSync('utils/supabase/middleware.ts', 'utf8')
 const middleware = readFileSync('middleware.ts', 'utf8')
 const gitignore = readFileSync('.gitignore', 'utf8')
+const workoutGenerator = readFileSync('app/lib/workout-generator.ts', 'utf8')
+const mealPlanAction = readFileSync('app/protected/profile/meal-plan/action.ts', 'utf8')
+const e2eAIFixtures = readFileSync('app/lib/e2e-ai-fixtures.ts', 'utf8')
 
 describe('end-to-end harness contract', () => {
   it('defines deterministic Playwright scripts and failure artifacts', () => {
@@ -44,6 +48,18 @@ describe('end-to-end harness contract', () => {
     assert.match(protectedFlowSpec, /page\.goto\('\/protected'\)/)
     assert.match(protectedFlowSpec, /page\.goto\('\/protected\/profile'\)/)
     assert.match(gitignore, /\/playwright\/\.auth\//)
+  })
+
+  it('gates mocked AI generation E2E coverage behind authenticated credentials and mock mode', () => {
+    assert.match(playwrightConfig, /hasMockedAIE2E/)
+    assert.match(playwrightConfig, /E2E_MOCK_AI/)
+    assert.match(playwrightConfig, /name: 'mocked-ai-generation'/)
+    assert.match(playwrightConfig, /mocked-generation\\\.spec\\\.ts/)
+    assert.match(mockedGenerationSpec, /E2E Squat to Reach/)
+    assert.match(mockedGenerationSpec, /E2E oatmeal/)
+    assert.match(workoutGenerator, /isE2EAIMockEnabled\(\)/)
+    assert.match(mealPlanAction, /isE2EAIMockEnabled\(\)/)
+    assert.match(e2eAIFixtures, /process\.env\.E2E_MOCK_AI === '1'/)
   })
 
   it('runs checks, build, and Playwright in CI and uploads failures', () => {

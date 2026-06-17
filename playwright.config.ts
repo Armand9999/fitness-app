@@ -4,6 +4,7 @@ const port = Number(process.env.PORT ?? 3000)
 const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? `http://127.0.0.1:${port}`
 const authFile = 'playwright/.auth/user.json'
 const hasAuthenticatedE2ECredentials = Boolean(process.env.E2E_AUTH_EMAIL && process.env.E2E_AUTH_PASSWORD)
+const hasMockedAIE2E = process.env.E2E_MOCK_AI === '1'
 
 const projects: PlaywrightTestConfig['projects'] = [
   {
@@ -27,6 +28,15 @@ if (hasAuthenticatedE2ECredentials) {
       use: { ...devices['Desktop Chrome'], storageState: authFile },
     },
   )
+}
+
+if (hasAuthenticatedE2ECredentials && hasMockedAIE2E) {
+  projects.push({
+    name: 'mocked-ai-generation',
+    testMatch: /mocked-generation\.spec\.ts/,
+    dependencies: ['authenticated setup'],
+    use: { ...devices['Desktop Chrome'], storageState: authFile },
+  })
 }
 
 export default defineConfig({

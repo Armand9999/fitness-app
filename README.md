@@ -61,6 +61,7 @@ The versioned Supabase schema in `supabase/migrations` defines the application t
 | `NEXT_APP_OPENAI_API_KEY` | Server only | OpenAI credential used to generate workouts and meal plans |
 | `E2E_AUTH_EMAIL` | Local/CI test runner only | Optional dedicated Supabase test-user email for authenticated Playwright flows |
 | `E2E_AUTH_PASSWORD` | Local/CI test runner only | Optional dedicated Supabase test-user password for authenticated Playwright flows |
+| `E2E_MOCK_AI` | Local/CI test runner only | Set to `1` to make authenticated generation E2E tests use deterministic workout and meal-plan fixtures instead of OpenAI |
 
 Never commit `.env.local` or real credentials. The checked-in `.env.example` contains placeholders only.
 
@@ -119,7 +120,7 @@ npm test
 
 The test command compiles the selected TypeScript source and tests into the ignored `.test-dist` directory, then runs them with Node's built-in test runner. The baseline suite covers authentication and profile schemas, TDEE calculations, generated workout and meal-plan validation, Supabase client contracts, and the required migration contract.
 
-Playwright always runs the public authentication journeys. Authenticated protected-flow tests are included automatically only when both `E2E_AUTH_EMAIL` and `E2E_AUTH_PASSWORD` are set. Use a dedicated non-production Supabase user, keep those values in `.env.local` or CI secrets, and never commit real credentials. The authenticated setup stores browser state under the ignored `playwright/.auth/` directory.
+Playwright always runs the public authentication journeys. Authenticated protected-flow tests are included automatically only when both `E2E_AUTH_EMAIL` and `E2E_AUTH_PASSWORD` are set. Use a dedicated non-production Supabase user, keep those values in `.env.local` or CI secrets, and never commit real credentials. The authenticated setup stores browser state under the ignored `playwright/.auth/` directory. Set `E2E_MOCK_AI=1` with the authenticated credentials to run deterministic meal-plan and workout-generation E2E coverage without making real OpenAI requests.
 
 ## Available Scripts
 
@@ -137,4 +138,4 @@ Playwright always runs the public authentication journeys. Authenticated protect
 
 ## Current Productionization Status
 
-This repository is being hardened incrementally. The current baseline includes deterministic builds, explicit quality scripts, validated authentication recovery, profile and TDEE domains, user-local daily tracking, versioned Supabase schema and Row Level Security policies, and documented environment setup. AI-generated workout and meal-plan output is now validated before persistence and regeneration is non-destructive. Public authentication journeys run in CI, and authenticated Supabase protected-flow smoke tests run whenever dedicated E2E credentials are configured. Upcoming work should introduce production observability, mocked AI generation E2E coverage, and automated deployment controls.
+This repository is being hardened incrementally. The current baseline includes deterministic builds, explicit quality scripts, validated authentication recovery, profile and TDEE domains, user-local daily tracking, versioned Supabase schema and Row Level Security policies, and documented environment setup. AI-generated workout and meal-plan output is now validated before persistence and regeneration is non-destructive. Public authentication journeys run in CI, authenticated Supabase protected-flow smoke tests run whenever dedicated E2E credentials are configured, and deterministic mocked-AI E2E coverage verifies generated workout and meal-plan persistence without spending model tokens. Upcoming work should introduce production observability and automated deployment controls.

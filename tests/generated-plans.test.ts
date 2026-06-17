@@ -8,6 +8,7 @@ import {
   parseGeneratedContent,
   parseMealPlanContent,
 } from '../app/lib/generated-plans'
+import { getMockMealPlanContent, getMockWorkoutPlan } from '../app/lib/e2e-ai-fixtures'
 
 const validWorkout = {
   workout_type: 'strength',
@@ -57,6 +58,11 @@ describe('generated plan validation', () => {
   it('parses validated legacy string meal plans', () => {
     assert.deepEqual(parseMealPlanContent(JSON.stringify(validMeals)), validMeals)
     assert.throws(() => parseMealPlanContent('{bad json'), /invalid JSON/)
+  })
+
+  it('keeps E2E AI fixtures valid against generated-plan schemas', () => {
+    assert.ok(GeneratedWorkoutPlanSchema.safeParse(getMockWorkoutPlan()).success)
+    assert.ok(MealPlanContentSchema.safeParse(getMockMealPlanContent()).success)
   })
 })
 

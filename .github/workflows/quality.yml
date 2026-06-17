@@ -16,6 +16,7 @@ jobs:
       NEXT_APP_OPENAI_API_KEY: test-openai-key
       E2E_AUTH_EMAIL: ${{ secrets.E2E_AUTH_EMAIL }}
       E2E_AUTH_PASSWORD: ${{ secrets.E2E_AUTH_PASSWORD }}
+      E2E_MOCK_AI: "1"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

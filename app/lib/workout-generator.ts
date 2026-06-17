@@ -3,6 +3,7 @@
 import OpenAI from 'openai'
 
 import { parseDateKey } from '@/app/lib/date'
+import { getMockWorkoutPlan, isE2EAIMockEnabled } from '@/app/lib/e2e-ai-fixtures'
 import { GeneratedWorkoutPlanSchema, WorkoutDurationSchema, parseGeneratedContent } from '@/app/lib/generated-plans'
 import { ProfileSchema } from '@/app/lib/profile'
 import { createClient } from '@/utils/supabase/server'
@@ -31,19 +32,20 @@ async function createAndSaveWorkoutPlan(durationInput: number, dateInput: string
   }
 
   const profile = ProfileSchema.parse(profileData)
-  const prompt = `Create a personalized ${duration}-minute bodyweight workout plan for a user with goal ${profile.goal}, gender ${profile.gender}, age ${profile.age}, and activity level ${profile.activity_level}. Return a JSON object with workout_type, difficulty, and a non-empty exercises array. Each exercise must include name and instructions, and may include sets, reps, duration, and rest.`
-
-  const response = await openai.chat.completions.create({
-    model: 'gpt-4.1',
-    messages: [{ role: 'system', content: prompt }],
-    response_format: { type: 'json_object' },
-    temperature: 0.7,
-  })
-
-  const workoutData = parseGeneratedContent(
-    response.choices[0]?.message.content,
-    GeneratedWorkoutPlanSchema,
-  )
+  const workoutData = isE2EAIMockEnabled()
+    ? getMockWorkoutPlan()
+    : parseGeneratedContent(
+      (await openai.chat.completions.create({
+        model: 'gpt-4.1',
+        messages: [{
+          role: 'system',
+          content: `Create a personalized ${duration}-minute bodyweight workout plan for a user with goal ${profile.goal}, gender ${profile.gender}, age ${profile.age}, and activity level ${profile.activity_level}. Return a JSON object with workout_type, difficulty, and a non-empty exercises array. Each exercise must include name and instructions, and may include sets, reps, duration, and rest.`,
+        }],
+        response_format: { type: 'json_object' },
+        temperature: 0.7,
+      })).choices[0]?.message.content,
+      GeneratedWorkoutPlanSchema,
+    )
 
   const { data: plan, error } = await supabase
     .from('workout_plans')
