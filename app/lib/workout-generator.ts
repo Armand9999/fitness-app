@@ -5,6 +5,7 @@ import OpenAI from 'openai'
 import { parseDateKey } from '@/app/lib/date'
 import { getMockWorkoutPlan, isE2EAIMockEnabled } from '@/app/lib/e2e-ai-fixtures'
 import { GeneratedWorkoutPlanSchema, WorkoutDurationSchema, parseGeneratedContent } from '@/app/lib/generated-plans'
+import { logError } from '@/app/lib/logger'
 import { ProfileSchema } from '@/app/lib/profile'
 import { createClient } from '@/utils/supabase/server'
 
@@ -88,7 +89,7 @@ export async function regenerateWorkoutPlan(duration: number, dateInput: string)
   try {
     return await createAndSaveWorkoutPlan(duration, parseDateKey(dateInput))
   } catch (error) {
-    console.error('Error regenerating workout plan:', error)
+    logError('workout.regenerate.failed', error, { duration })
     throw new Error('Failed to regenerate workout plan')
   }
 }

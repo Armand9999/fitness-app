@@ -3,6 +3,7 @@ import "./globals.css";
 import { createClient } from "@/utils/supabase/server";
 import { NavBar } from "./components/NavBar";
 import { Footer } from "./components/Footer";
+import { logError } from "./lib/logger";
 
 
 export const dynamic = 'force-dynamic'
@@ -23,7 +24,7 @@ async function getUser() {
     const { data: { user } } = await supabase.auth.getUser();
     return user;
   } catch (error) {
-    console.error("Error fetching user:", error);
+    logError("layout.user_fetch.failed", error);
     return null;
   }
 }

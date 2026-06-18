@@ -1,6 +1,7 @@
 'use server'
 
 import { type ProfileFieldErrors } from '@/app/lib/profile-options'
+import { logError } from '@/app/lib/logger'
 import { ProfileSchema } from '@/app/lib/profile'
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
@@ -45,7 +46,7 @@ export async function createProfile(formData: FormData): Promise<ProfileActionRe
   })
 
   if (saveError) {
-    console.error('Failed to save profile and TDEE estimate:', saveError.message)
+    logError('profile.save_with_tde.failed', saveError, { userPresent: Boolean(user.id) })
     return { success: false, message: 'We could not save your profile. Please try again.' }
   }
 

@@ -1,12 +1,16 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import { logError } from "./app/lib/logger"
 import { updateSession } from "./utils/supabase/middleware"
 
 export async function middleware(request: NextRequest) {
     try {
         return await updateSession(request)
     } catch (error) {
-        console.error('Session update error:', error)
+        logError('middleware.session_update.failed', error, {
+            pathname: request.nextUrl.pathname,
+            protectedRoute: request.nextUrl.pathname.startsWith("/protected"),
+        })
         
         // Fail closed for protected routes, while public routes remain available.
         if (request.nextUrl.pathname.startsWith("/protected")) {

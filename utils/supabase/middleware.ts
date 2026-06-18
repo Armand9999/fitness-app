@@ -2,6 +2,7 @@ import { createServerClient, type SetAllCookies } from "@supabase/ssr";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import type { Database } from "@/app/lib/database.types";
+import { logError } from "@/app/lib/logger";
 import { type NextRequest, NextResponse } from "next/server";
 
 export async function updateSession(request: NextRequest) {
@@ -24,7 +25,7 @@ export async function updateSession(request: NextRequest) {
                         })
                         cookiesToSet.forEach(({ name, value, options }) => supabaseResponse.cookies.set(name, value, options ))
                     } catch (error) {
-                        console.error("Error setting cookies:", error);
+                        logError("supabase.middleware.set_cookies.failed", error);
                     }
                 },
             }
@@ -61,4 +62,3 @@ export async function updateSession(request: NextRequest) {
 
     return supabaseResponse;
 }
-

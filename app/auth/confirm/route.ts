@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { type NextRequest } from 'next/server'
 
 import { getSafeRedirectPath } from '@/app/lib/auth'
+import { logError } from '@/app/lib/logger'
 import { createClient } from '@/utils/supabase/server'
 
 export async function GET(request: NextRequest) {
@@ -21,6 +22,11 @@ export async function GET(request: NextRequest) {
 
   if (!error) redirect(next)
 
-  console.error('Authentication callback failed:', error.message)
+  logError('auth.callback.failed', error, {
+    hasCode: Boolean(code),
+    hasTokenHash: Boolean(tokenHash),
+    type,
+    next,
+  })
   redirect('/error')
 }

@@ -1,6 +1,7 @@
 'use server'
 
 import { PasswordRecoverySchema, getSiteUrl } from '@/app/lib/auth'
+import { logError } from '@/app/lib/logger'
 import { createClient } from '@/utils/supabase/server'
 
 export type PasswordRecoveryState = {
@@ -21,7 +22,7 @@ export async function requestPasswordReset(
     redirectTo: `${getSiteUrl()}/auth/confirm?next=/reset-password`,
   })
 
-  if (error) console.error('Password recovery request failed:', error.message)
+  if (error) logError('password_recovery.request.failed', error, { emailSubmitted: true })
 
   return {
     success: true,

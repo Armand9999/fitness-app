@@ -51,15 +51,6 @@ The versioned Supabase schema in `supabase/migrations` defines the application t
 
 5. Open [http://localhost:3000](http://localhost:3000).
 
-### Windows PowerShell note
-
-If you are using PowerShell, create `.env.local` with the examples above and run the mocked E2E command like this:
-
-```powershell
-$env:E2E_MOCK_AI = "1"
-npm run test:e2e
-```
-
 ## Environment Variables
 
 | Variable | Scope | Purpose |
@@ -77,6 +68,17 @@ Never commit `.env.local` or real credentials. The checked-in `.env.example` con
 ## Authentication Redirects
 
 Add the deployed application origin and `/auth/confirm` callback to the Supabase Authentication URL configuration. Password recovery sends users through `/auth/confirm?next=/reset-password`; the callback verifies either PKCE codes or email OTP token hashes and only permits local redirect paths.
+
+## Observability and Operations
+
+The app exposes lightweight operational endpoints:
+
+- `GET /api/health` returns a non-sensitive uptime payload for load balancers and external monitors.
+- `GET /api/readiness` verifies required environment variable names are configured and returns `503` when configuration is incomplete. It reports missing variable names only and never returns secret values.
+
+Server-side failure paths should use the structured logger in `app/lib/logger.ts` instead of raw `console.error` calls. The logger redacts metadata keys that look like credentials, tokens, cookies, or secrets. Keep user-facing messages generic, and put only safe operational context such as route names, action names, booleans, status codes, and error codes into logs.
+
+Generation actions should remain protected by Supabase authentication and Row Level Security. Production deployments should additionally enforce request rate limits for workout and meal-plan generation at the hosting edge, API gateway, or Supabase layer to control cost and abuse.
 
 ## Supabase Database
 
@@ -116,13 +118,6 @@ Run the complete local quality gate:
 ```bash
 npm run check
 npm run build
-npm run test:e2e
-```
-
-Windows PowerShell users can set the mocked E2E environment variable directly and then run Playwright:
-
-```powershell
-$env:E2E_MOCK_AI = "1"
 npm run test:e2e
 ```
 

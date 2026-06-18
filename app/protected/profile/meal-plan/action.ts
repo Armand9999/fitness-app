@@ -5,6 +5,7 @@ import OpenAI from 'openai'
 import { parseDateKey } from '@/app/lib/date'
 import { getMockMealPlanContent, isE2EAIMockEnabled } from '@/app/lib/e2e-ai-fixtures'
 import { MealPlanContentSchema, parseGeneratedContent } from '@/app/lib/generated-plans'
+import { logError } from '@/app/lib/logger'
 import { ProfileSchema } from '@/app/lib/profile'
 import { createClient } from '@/utils/supabase/server'
 
@@ -83,7 +84,7 @@ export async function regenerateMealPlan(dateInput: string) {
   try {
     return await createAndSaveMealPlan(dateInput)
   } catch (error) {
-    console.error('Meal plan regeneration error:', error)
+    logError('meal_plan.regenerate.failed', error)
     throw new Error('Failed to regenerate meal plan')
   }
 }
@@ -107,7 +108,7 @@ export async function getMeal(dateInput: string) {
   try {
     return await createAndSaveMealPlan(date)
   } catch (generationError) {
-    console.error('Meal plan generation error:', generationError)
+    logError('meal_plan.generate.failed', generationError)
     throw new Error('Failed to generate meal plan')
   }
 }

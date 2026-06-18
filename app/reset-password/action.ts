@@ -1,6 +1,7 @@
 'use server'
 
 import { PasswordResetSchema } from '@/app/lib/auth'
+import { logError } from '@/app/lib/logger'
 import { createClient } from '@/utils/supabase/server'
 
 export type PasswordResetState = {
@@ -27,7 +28,7 @@ export async function updatePassword(
 
   const { error } = await supabase.auth.updateUser({ password: parsed.data.password })
   if (error) {
-    console.error('Password update failed:', error.message)
+    logError('password_reset.update.failed', error)
     return { message: 'We could not update your password. Request a new reset link and try again.' }
   }
 
