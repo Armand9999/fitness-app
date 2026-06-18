@@ -116,6 +116,7 @@ The temporary `supabase/remote-database.types.ts` comparison artifact is ignored
 Run the complete local quality gate:
 
 ```bash
+npm run env:check
 npm run check
 npm run build
 npm run test:e2e
@@ -133,6 +134,33 @@ The test command compiles the selected TypeScript source and tests into the igno
 
 Playwright always runs the public authentication journeys. Authenticated protected-flow tests are included automatically only when both `E2E_AUTH_EMAIL` and `E2E_AUTH_PASSWORD` are set. Use a dedicated non-production Supabase user, keep those values in `.env.local` or CI secrets, and never commit real credentials. The authenticated setup stores browser state under the ignored `playwright/.auth/` directory. Set `E2E_MOCK_AI=1` with the authenticated credentials to run deterministic meal-plan and workout-generation E2E coverage without making real OpenAI requests.
 
+## Deployment and Release Checklist
+
+Use `npm run env:check` before release builds and deployments. It reports missing variable names only and does not print configured secret values.
+
+Release checklist:
+
+1. Confirm production environment variables are configured with `npm run env:check`.
+2. Run the Supabase preflight SQL in `supabase/preflight/20260611170000_reconcile_fitness_schema.sql` and verify it returns no rows.
+3. Review `supabase migration list --linked`.
+4. Run `supabase db push --dry-run`.
+5. Apply migrations with `supabase db push`.
+6. Run `npm run check`.
+7. Run `npm run build`.
+8. Run `npm run test:e2e` with `E2E_MOCK_AI=1` and dedicated E2E credentials when available.
+9. Deploy the application.
+10. Verify `GET /api/health` returns `200`.
+11. Verify `GET /api/readiness` returns `200` in the deployed environment.
+12. Monitor structured logs for new `*.failed` events.
+
+Rollback checklist:
+
+1. Stop or pause new deployments.
+2. Revert to the previous known-good application deployment.
+3. Do not roll back database migrations unless a reviewed backward migration is available.
+4. Re-run `/api/health`, `/api/readiness`, and the E2E suite against the restored deployment.
+5. Review logs and document the failure before attempting a new release.
+
 ## Available Scripts
 
 | Command | Description |
@@ -143,10 +171,11 @@ Playwright always runs the public authentication journeys. Authenticated protect
 | `npm run lint` | Lint the repository with ESLint |
 | `npm run typecheck` | Run the TypeScript compiler without emitting files |
 | `npm test` | Compile and run the baseline unit tests |
+| `npm run env:check` | Validate required deployment environment variables without printing secret values |
 | `npm run check` | Run lint, type-checking, and unit tests |
 | `npm run test:e2e` | Run Playwright public journeys and, when E2E credentials are configured, authenticated protected-flow checks in Chromium |
 | `npm run ci` | Run checks, production build, and end-to-end tests |
 
 ## Current Productionization Status
 
-This repository is being hardened incrementally. The current baseline includes deterministic builds, explicit quality scripts, validated authentication recovery, profile and TDEE domains, user-local daily tracking, versioned Supabase schema and Row Level Security policies, and documented environment setup. AI-generated workout and meal-plan output is now validated before persistence and regeneration is non-destructive. Public authentication journeys run in CI, authenticated Supabase protected-flow smoke tests run whenever dedicated E2E credentials are configured, and deterministic mocked-AI E2E coverage verifies generated workout and meal-plan persistence without spending model tokens. Upcoming work should introduce production observability and automated deployment controls.
+This repository is being hardened incrementally. The current baseline includes deterministic builds, explicit quality scripts, validated authentication recovery, profile and TDEE domains, user-local daily tracking, versioned Supabase schema and Row Level Security policies, and documented environment setup. AI-generated workout and meal-plan output is now validated before persistence and regeneration is non-destructive. Public authentication journeys run in CI, authenticated Supabase protected-flow smoke tests run whenever dedicated E2E credentials are configured, and deterministic mocked-AI E2E coverage verifies generated workout and meal-plan persistence without spending model tokens. Deployment readiness now includes secret-safe environment validation and release/rollback checklists. Upcoming work should introduce security hardening and abuse protection.
