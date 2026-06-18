@@ -6,11 +6,18 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "rm -rf .test-dist && tsc -p tsconfig.test.json && node --test .test-dist/tests/*.test.js",
+    "check": "npm run lint && npm run typecheck && npm test",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "ci": "npm run env:check && npm run check && npm run build && npm run test:e2e",
+    "env:check": "node scripts/check-env.mjs"
   },
   "dependencies": {
-    "@supabase/ssr": "^0.6.1",
-    "@supabase/supabase-js": "^2.49.4",
+    "@supabase/ssr": "0.6.1",
+    "@supabase/supabase-js": "2.49.4",
     "dotenv": "^16.5.0",
     "next": "15.3.1",
     "openai": "^5.2.0",
@@ -27,6 +34,7 @@
     "eslint": "^9.25.1",
     "eslint-config-next": "15.3.1",
     "tailwindcss": "^4",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "@playwright/test": "1.55.0"
   }
 }
