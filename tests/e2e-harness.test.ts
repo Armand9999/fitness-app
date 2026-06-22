@@ -18,7 +18,7 @@ const e2eAIFixtures = readFileSync('app/lib/e2e-ai-fixtures.ts', 'utf8')
 
 describe('end-to-end harness contract', () => {
   it('defines deterministic Playwright scripts and failure artifacts', () => {
-    assert.equal(packageJson.scripts['test:e2e'], 'playwright test')
+    assert.equal(packageJson.scripts['test:e2e'], 'cross-env E2E_MOCK_AI=1 playwright test')
     assert.match(playwrightConfig, /screenshot: 'only-on-failure'/)
     assert.match(playwrightConfig, /trace: 'on-first-retry'/)
     assert.match(playwrightConfig, /video: 'retain-on-failure'/)
