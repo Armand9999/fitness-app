@@ -1,0 +1,1 @@
+-- Application data belongs to authenticated users, so no shared seed data is required.
