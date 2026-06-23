@@ -84,7 +84,7 @@ The app exposes lightweight operational endpoints:
 
 Server-side failure paths should use the structured logger in `app/lib/logger.ts` instead of raw `console.error` calls. The logger redacts metadata keys that look like credentials, tokens, cookies, or secrets. Keep user-facing messages generic, and put only safe operational context such as route names, action names, booleans, status codes, and error codes into logs.
 
-Generation actions should remain protected by Supabase authentication and Row Level Security. Production deployments should additionally enforce request rate limits for workout and meal-plan generation at the hosting edge, API gateway, or Supabase layer to control cost and abuse.
+Generation actions are protected by Supabase authentication, Row Level Security, and a best-effort per-process rate limiter before costly workout or meal-plan generation runs. Production deployments should still enforce durable request rate limits at the hosting edge, API gateway, or Supabase layer to control cost and abuse across serverless instances.
 
 ## Supabase Database
 
@@ -157,6 +157,6 @@ Playwright always runs the public authentication journeys. Authenticated protect
 
 ## Current Productionization Status
 
-This repository is being hardened incrementally. The current baseline includes deterministic builds, explicit quality scripts, validated authentication recovery, profile and TDEE domains, user-local daily tracking, versioned Supabase schema and Row Level Security policies, documented environment setup, observability endpoints, and release controls. AI-generated workout and meal-plan output is now validated before persistence and regeneration is non-destructive. Public authentication journeys run in CI, authenticated Supabase protected-flow smoke tests run whenever dedicated E2E credentials are configured, and deterministic mocked-AI E2E coverage verifies generated workout and meal-plan persistence without spending model tokens. Upcoming work should focus on security hardening and abuse protection.
+This repository is being hardened incrementally. The current baseline includes deterministic builds, explicit quality scripts, validated authentication recovery, profile and TDEE domains, user-local daily tracking, versioned Supabase schema and Row Level Security policies, documented environment setup, observability endpoints, and release controls. AI-generated workout and meal-plan output is now validated before persistence and regeneration is non-destructive. Public authentication journeys run in CI, authenticated Supabase protected-flow smoke tests run whenever dedicated E2E credentials are configured, and deterministic mocked-AI E2E coverage verifies generated workout and meal-plan persistence without spending model tokens. Upcoming work should focus on durable edge/API-gateway rate limits and broader abuse monitoring.
 
 Deployment and rollback steps are documented in `docs/release.md`.

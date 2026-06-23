@@ -5,6 +5,7 @@ import OpenAI from 'openai'
 import { parseDateKey } from '@/app/lib/date'
 import { getMockWorkoutPlan, isE2EAIMockEnabled } from '@/app/lib/e2e-ai-fixtures'
 import { GeneratedWorkoutPlanSchema, WorkoutDurationSchema, parseGeneratedContent } from '@/app/lib/generated-plans'
+import { assertGenerationAllowed } from '@/app/lib/generation-rate-limit'
 import { logError } from '@/app/lib/logger'
 import { ProfileSchema } from '@/app/lib/profile'
 import { createClient } from '@/utils/supabase/server'
@@ -31,6 +32,8 @@ async function createAndSaveWorkoutPlan(durationInput: number, dateInput: string
   if (profileError || !profileData) {
     throw new Error('Complete your profile before generating a workout plan')
   }
+
+  assertGenerationAllowed(user.id, 'workout_plan')
 
   const profile = ProfileSchema.parse(profileData)
   const workoutData = isE2EAIMockEnabled()

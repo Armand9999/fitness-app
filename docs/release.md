@@ -51,7 +51,8 @@ Do not print secret values in CI logs. The `env:check` command reports variable 
 - Open `/protected` and verify the dashboard loads.
 - Open `/protected/profile` and verify the profile form loads.
 - Generate or regenerate meal/workout plans only with a safe test user.
-- Watch structured logs for `*.failed` events and unexpected readiness failures.
+- Verify repeated generation attempts produce generic user-facing errors and structured `generation.rate_limited` warnings instead of model calls.
+- Watch structured logs for `*.failed` events, `generation.rate_limited` events, and unexpected readiness failures.
 
 ## 6. Rollback plan
 

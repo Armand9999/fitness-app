@@ -5,6 +5,7 @@ import OpenAI from 'openai'
 import { parseDateKey } from '@/app/lib/date'
 import { getMockMealPlanContent, isE2EAIMockEnabled } from '@/app/lib/e2e-ai-fixtures'
 import { MealPlanContentSchema, parseGeneratedContent } from '@/app/lib/generated-plans'
+import { assertGenerationAllowed } from '@/app/lib/generation-rate-limit'
 import { logError } from '@/app/lib/logger'
 import { ProfileSchema } from '@/app/lib/profile'
 import { createClient } from '@/utils/supabase/server'
@@ -43,6 +44,8 @@ async function createAndSaveMealPlan(dateInput: string) {
   if (tdeError || !tdeEstimate || tdeEstimate.tde_value <= 0) {
     throw new Error('A valid TDEE estimate is required to create a meal plan')
   }
+
+  assertGenerationAllowed(user.id, 'meal_plan')
 
   const meals = isE2EAIMockEnabled()
     ? getMockMealPlanContent()
