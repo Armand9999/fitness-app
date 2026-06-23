@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react'
 import { getMeal, regenerateMealPlan } from './action'
 import Link from 'next/link'
+import { getLocalDateKey } from '@/app/lib/date'
+import { parseMealPlanContent } from '@/app/lib/generated-plans'
 
 export default function MealPlanPage() {
   const [plan, setPlan] = useState<{
@@ -18,7 +20,7 @@ export default function MealPlanPage() {
   useEffect(() => {
     async function fetchMealPlan() {
       try {
-        const mealPlan = await getMeal()
+        const mealPlan = await getMeal(getLocalDateKey())
         setPlan(mealPlan)
       } catch (err) {
         setError('Failed to load meal plan')
@@ -34,7 +36,7 @@ export default function MealPlanPage() {
   const handleRegenerate = async () => {
     setRegenerating(true)
     try {
-      const newPlan = await regenerateMealPlan()
+      const newPlan = await regenerateMealPlan(getLocalDateKey())
       setPlan(newPlan)
     } catch (error) {
       setError('Failed to regenerate meal plan')
@@ -64,9 +66,16 @@ export default function MealPlanPage() {
     </div>
   )
 
-  // Parse meals if it's stored as a JSON string
-  const mealsData = typeof plan.meals === 'string' ? JSON.parse(plan.meals) : plan.meals
-  const meals = mealsData?.Meals || mealsData
+  let meals
+  try {
+    meals = parseMealPlanContent(plan.meals).Meals
+  } catch {
+    return (
+      <div className="max-w-xl mx-auto p-6 bg-red-50 dark:bg-red-900/20 rounded-lg">
+        <p className="text-red-600 dark:text-red-400">The saved meal plan is invalid. Generate a new plan to continue.</p>
+      </div>
+    )
+  }
 
   const mealIcons = {
     Breakfast: "🍳",
