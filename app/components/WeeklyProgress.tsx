@@ -27,7 +27,7 @@ export default function WeeklyProgress() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
 
-      const { weekStart, weekEnd } = getWeekDates()
+      const { weekStart, weekEnd, startDateKey, endDateKey } = getWeekDates()
 
       // Get workouts this week
       const { data: workouts, error: workoutsError } = await supabase
@@ -42,16 +42,16 @@ export default function WeeklyProgress() {
         .from('water_intake')
         .select('*')
         .eq('user_id', user.id)
-        .gte('date', weekStart.toISOString().split('T')[0])
-        .lte('date', weekEnd.toISOString().split('T')[0])
+        .gte('date', startDateKey)
+        .lte('date', endDateKey)
 
       // Get meal plans followed this week
       const { data: mealPlans, error: mealError } = await supabase
         .from('meal_plans')
         .select('*')
         .eq('user_id', user.id)
-        .gte('date', weekStart.toISOString().split('T')[0])
-        .lte('date', weekEnd.toISOString().split('T')[0])
+        .gte('date', startDateKey)
+        .lte('date', endDateKey)
 
       if (workoutsError || waterError || mealError) {
         setError('Failed to load some weekly data.')

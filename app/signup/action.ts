@@ -5,6 +5,7 @@ import { createClient } from "../../utils/supabase/server"
 import { redirect } from "next/navigation"
 
 import { SignUpSchema, FormState } from "../lib/definitions"
+import { logError } from "../lib/logger"
 
 export async function signup(state: FormState, formData: FormData) {
     const supabase = await createClient();
@@ -34,12 +35,10 @@ export async function signup(state: FormState, formData: FormData) {
     })
 
     if(error) {
-        console.log('Authentication error:', {
-        code: error.code,
-        message: error.message,
-        status: error.status
+        logError('auth.signup.failed', error, {
+            code: error.code,
+            status: error.status,
         })
-
         redirect( `/error`)
     }
 
