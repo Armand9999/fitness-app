@@ -86,6 +86,12 @@ Server-side failure paths should use the structured logger in `app/lib/logger.ts
 
 Generation actions are protected by Supabase authentication, Row Level Security, and a best-effort per-process rate limiter before costly workout or meal-plan generation runs. Production deployments should still enforce durable request rate limits at the hosting edge, API gateway, or Supabase layer to control cost and abuse across serverless instances.
 
+## Vercel Deployment Controls
+
+This app includes a `vercel.json` configuration that applies baseline security headers to every route in Vercel deployments, including HSTS, frame denial, MIME-sniffing protection, a strict referrer policy, and a restrictive permissions policy. Keep these headers enabled for preview and production deployments unless a specific integration requires a reviewed exception.
+
+Because Vercel serverless instances do not share in-memory state, keep the in-app generation limiter as a fast local guard and configure durable abuse controls at the Vercel edge for production. At minimum, add Vercel Firewall or WAF rules that rate-limit authenticated generation POST traffic and alert on repeated `generation.rate_limited` log events.
+
 ## Supabase Database
 
 The `supabase` directory contains the local project configuration and versioned database migrations. The empty `20260611155633_remote_baseline.sql` marker represents the existing dashboard-managed schema already recorded remotely. The following reconciliation migration safely hardens those existing tables, preserves `food_logs`, enables consistent Row Level Security, prevents duplicate daily records, and defines the atomic `save_profile_with_tde` database function.
@@ -157,6 +163,6 @@ Playwright always runs the public authentication journeys. Authenticated protect
 
 ## Current Productionization Status
 
-This repository is being hardened incrementally. The current baseline includes deterministic builds, explicit quality scripts, validated authentication recovery, profile and TDEE domains, user-local daily tracking, versioned Supabase schema and Row Level Security policies, documented environment setup, observability endpoints, and release controls. AI-generated workout and meal-plan output is now validated before persistence and regeneration is non-destructive. Public authentication journeys run in CI, authenticated Supabase protected-flow smoke tests run whenever dedicated E2E credentials are configured, and deterministic mocked-AI E2E coverage verifies generated workout and meal-plan persistence without spending model tokens. Upcoming work should focus on durable edge/API-gateway rate limits and broader abuse monitoring.
+This repository is being hardened incrementally. The current baseline includes deterministic builds, explicit quality scripts, validated authentication recovery, profile and TDEE domains, user-local daily tracking, versioned Supabase schema and Row Level Security policies, documented environment setup, observability endpoints, and release controls. AI-generated workout and meal-plan output is now validated before persistence and regeneration is non-destructive. Public authentication journeys run in CI, authenticated Supabase protected-flow smoke tests run whenever dedicated E2E credentials are configured, and deterministic mocked-AI E2E coverage verifies generated workout and meal-plan persistence without spending model tokens. Upcoming work should focus on enabling Vercel Firewall/WAF rate-limit rules in production and wiring those events into broader abuse monitoring.
 
 Deployment and rollback steps are documented in `docs/release.md`.

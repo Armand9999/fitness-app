@@ -37,14 +37,18 @@ Optional E2E secrets/environment variables:
 
 Do not print secret values in CI logs. The `env:check` command reports variable names only.
 
+- Confirm Vercel Firewall/WAF rules are enabled for generation-heavy authenticated POST traffic before promoting the deployment.
+
 ## 4. Deploy
 
-- Deploy the application through the hosting provider after CI passes.
+- Deploy the application through Vercel after CI passes.
+- Confirm `vercel.json` security headers are present on preview and production deployments.
 - Keep the previous deployment available until smoke checks pass.
 - Do not rotate secrets during the deploy unless the release explicitly requires it.
 
 ## 5. Post-deploy smoke checks
 
+- Check response headers include `Strict-Transport-Security`, `X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`, and `Permissions-Policy`.
 - Check `GET /api/health` returns `200` and `status: ok`.
 - Check `GET /api/readiness` returns `200` and `status: ready`.
 - Sign in with a non-production test user if available.
